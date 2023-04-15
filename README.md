@@ -17,7 +17,7 @@
 
 这里从 webhook 拿了一些自认为比较重要的信息，比如触发部署的 commit 信息，当前的部署状态等。
 
-```tsx
+```ts
 import { RailwayWebhook } from "./type.ts";
 
 const server = Deno.listen({ port: 80 });
@@ -56,7 +56,7 @@ async function serveHttp(conn: Deno.Conn) {
 
 将消息发给飞书就更简单了，Deno 可以直接写标准的 Web API，直接用 fetch 发请求就好，只是为了灵活性，我们从环境变量中读取机器人的 id。
 
-```tsx
+```ts
 const feishuBotId = Deno.env.get("FEISHU_BOT_ID");
 
 async function sendToFeishu(message: string) {
