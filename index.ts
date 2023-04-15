@@ -31,7 +31,7 @@ async function serveHttp(conn: Deno.Conn) {
 
     if (request.method !== "POST") {
       respondWith(
-        new Response("Get", {
+        new Response("Not Post", {
           status: 200,
         })
       );

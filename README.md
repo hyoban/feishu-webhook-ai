@@ -85,4 +85,8 @@ async function sendToFeishu(message: string) {
 
 只需要从你的仓库创建一个项目，选择 `index.ts` 文件，然后添加 `FEISHU_BOT_ID` 的环境变量即可。最后就是将部署成功，Deno 分配给你的域名填到此前说过的 Railway 的 Webhook 设置项即可。
 
-![https://image.hyoban.cc/file/436c1b05e1dedc7f9f52b.png](https://image.hyoban.cc/file/436c1b05e1dedc7f9f52b.png)
+![how to deploy](https://image.hyoban.cc/file/436c1b05e1dedc7f9f52b.png)
+
+要看到效果的话，就只需要在 Railway 上部署一下项目，然后等待飞书的通知吧。
+
+![example](https://image.hyoban.cc/file/4154bf450819d090acd50.png)
