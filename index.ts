@@ -27,9 +27,7 @@ async function sendToFeishu(message: string) {
 
 // create a server to receive railway webhooks
 
-// Start listening on port 8080 of localhost.
-const server = Deno.listen({ port: 8080 });
-console.log(`HTTP webserver running.  Access it at:  http://localhost:8080/`);
+const server = Deno.listen({ port: 80 });
 
 // Connections to the server will be yielded up as an async iterable.
 for await (const conn of server) {
@@ -47,14 +45,25 @@ async function serveHttp(conn: Deno.Conn) {
     // The native HTTP server uses the web standard `Request` and `Response`
     // objects.
     const { request, respondWith } = requestEvent;
-    const body = await request.json() as RailwayWebhook;
 
-    await sendToFeishu(`Deployed ${body.project.name} to ${body.environment.name} at ${body.timestamp}`);
-
-    respondWith(
-      new Response("Hello World", {
-        status: 200,
-      }),
-    );
+    if (request.method !== "POST") {
+      respondWith(
+        new Response("Get", {
+          status: 200,
+        }),
+      );
+    } else {
+      const body = await request.json();
+      console.log(body);
+      const webhook = body as RailwayWebhook;
+      const message = `Railway Deployment: ${webhook.deployment.id} by ${webhook.deployment.creator.name} in ${webhook.environment.name} of ${webhook.project.name} at ${webhook.timestamp}`;
+      console.log(message);
+      await sendToFeishu(message);
+      respondWith(
+        new Response("Post", {
+          status: 200,
+        }),
+      );
+    }
   }
 }
