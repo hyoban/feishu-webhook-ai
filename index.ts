@@ -56,7 +56,7 @@ async function serveHttp(conn: Deno.Conn) {
       const body = await request.json();
       console.log(body);
       const webhook = body as RailwayWebhook;
-      const message = `Railway Deployment: ${webhook.deployment.id} by ${webhook.deployment.creator.name} in ${webhook.environment.name} of ${webhook.project.name} at ${webhook.timestamp}`;
+      const message = `Railway ${webhook.type} by ${webhook.deployment.creator.name} in ${webhook.environment.name} of ${webhook.project.name} at ${webhook.timestamp}`;
       console.log(message);
       await sendToFeishu(message);
       respondWith(
