@@ -39,7 +39,7 @@ async function serveHttp(conn: Deno.Conn) {
       const body = await request.json();
       console.log(body);
       const webhook = body as RailwayWebhook;
-      const message = `Railway 项目 ${webhook.project.name} 的 ${webhook.environment.name} 环境 的 ${webhook.service.name} 服务部署状态变更为 ${webhook.status}。相关的 commit 信息为：${webhook.deployment.meta.commitMessage}。`;
+      const message = `Railway 项目 ${webhook.project.name} 的 ${webhook.environment.name} 环境 的 ${webhook.service.name} 服务由 ${webhook.deployment.creator.name} 因为 ${webhook.deployment.meta.commitMessage} 将状态变更为 ${webhook.status}。`;
       await sendToFeishu(message);
       respondWith(
         new Response("Post", {
