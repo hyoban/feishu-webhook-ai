@@ -17,65 +17,9 @@
 
 这里从 webhook 拿了一些自认为比较重要的信息，比如触发部署的 commit 信息，当前的部署状态等。
 
-```ts
-import { RailwayWebhook } from "./type.ts";
-
-const server = Deno.listen({ port: 80 });
-for await (const conn of server) {
-  serveHttp(conn);
-}
-
-async function serveHttp(conn: Deno.Conn) {
-  const httpConn = Deno.serveHttp(conn);
-  for await (const requestEvent of httpConn) {
-    const { request, respondWith } = requestEvent;
-
-    if (request.method !== "POST") {
-      respondWith(
-        new Response("Not POST", {
-          status: 200,
-        })
-      );
-    } else {
-      const body = await request.json();
-      console.log(body);
-      const webhook = body as RailwayWebhook;
-      const message = `Railway 项目 ${webhook.project.name} 的 ${webhook.environment.name} 环境 的 ${webhook.service.name} 服务由 ${webhook.deployment.creator.name} 因为 ${webhook.deployment.meta.commitMessage} 将状态变更为 ${webhook.status}。`;
-      // 转发信息到飞书
-      respondWith(
-        new Response("Post", {
-          status: 200,
-        })
-      );
-    }
-  }
-}
-```
-
 ## 发给飞书
 
 将消息发给飞书就更简单了，Deno 可以直接写标准的 Web API，直接用 fetch 发请求就好，只是为了灵活性，我们从环境变量中读取机器人的 id。
-
-```ts
-const feishuBotId = Deno.env.get("FEISHU_BOT_ID");
-
-async function sendToFeishu(message: string) {
-  const url = "https://open.feishu.cn/open-apis/bot/v2/hook/" + feishuBotId;
-  const body = {
-    msg_type: "text",
-    content: {
-      text: message,
-    },
-  };
-  await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-}
-```
 
 这里就只是将文本信息发送过去，事实上飞书的接口允许我们发送更多格式的信息，你可以查看第一节中提到的文章。
 
@@ -94,32 +38,5 @@ async function sendToFeishu(message: string) {
 ## 补充，再进一步
 
 为什么要只处理 Railway 平台呢？借助 ChatGPT，我们可以让其自动摘要任意发送的信息，并转化成通知信息。这样，我们就可以将任意平台的通知信息转发到飞书了。
-
-```ts
-async function requestOpenAI(prompt: string) {
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${openAIKey}`,
-    },
-    method: "POST",
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "user",
-          content: `你是一个webhook机器人，接收一个json字符串作为输入，
-            其内容一般为代码的编译部署进度状态信息或其他通知信息。
-            你需要从中获取自己认为重要的信息，将其转换为一句便于人类阅读了解的通知信息返回。
-            以下是输入的json：${prompt}`,
-        },
-      ],
-    }),
-  });
-
-  const data = await res.json();
-  return data.choices[0].message.content;
-}
-```
 
 所以，别忘了在部署的时候加上一个 `OPENAI_KEY` 的环境变量。
