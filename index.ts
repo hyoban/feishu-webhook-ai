@@ -16,6 +16,8 @@ async function requestOpenAI(prompt: string) {
           content: `你是一个webhook机器人，接收一个json字符串作为输入，
             其内容一般为代码的编译部署进度状态信息或其他通知信息。
             你需要从中获取自己认为重要的信息，将其转换为一句便于人类阅读了解的通知信息返回。
+            如果存在的话，希望包含时间，项目名称，相关的 git commit message，
+            部署的状态（正在部署，已部署成功等），部署的环境等信息。
             以下是输入的json：${prompt}`,
         },
       ],
