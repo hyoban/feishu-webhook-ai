@@ -90,3 +90,36 @@ async function sendToFeishu(message: string) {
 要看到效果的话，就只需要在 Railway 上部署一下项目，然后等待飞书的通知吧。
 
 ![example](https://image.hyoban.cc/file/4154bf450819d090acd50.png)
+
+## 补充，再进一步
+
+为什么要只处理 Railway 平台呢？借助 ChatGPT，我们可以让其自动摘要任意发送的信息，并转化成通知信息。这样，我们就可以将任意平台的通知信息转发到飞书了。
+
+```ts
+async function requestOpenAI(prompt: string) {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${openAIKey}`,
+    },
+    method: "POST",
+    body: JSON.stringify({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "user",
+          content: `你是一个webhook机器人，接收一个json字符串作为输入，
+            其内容一般为代码的编译部署进度状态信息或其他通知信息。
+            你需要从中获取自己认为重要的信息，将其转换为一句便于人类阅读了解的通知信息返回。
+            以下是输入的json：${prompt}`,
+        },
+      ],
+    }),
+  });
+
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
+```
+
+所以，别忘了在部署的时候加上一个 `OPENAI_KEY` 的环境变量。
