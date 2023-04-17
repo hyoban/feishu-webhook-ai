@@ -11,7 +11,7 @@
 
 ## 拿来吧 Railway
 
-点开 Railway 项目的设置项，你可以找到 webhook 的设置项，等我们的 Deno 程序部署好了就可以填到这里。下面有 webhook 会发送的信息，但是已经过时了，这里我给出我抓到的实际信息的 [TS 类型](https://github.com/hyoban/railway-to-feishu/blob/main/type.ts)。
+点开 Railway 项目的设置项，你可以找到 webhook 的设置项，等我们的 Deno 程序部署好了就可以填到这里。下面有 webhook 会发送的信息，但是已经过时了，你可以在日志里找到实际发送的信息格式。
 
 然后，我们开始写 Deno 的服务端，Deno 的文档里有讲你该如何写一个 [HTTP Web Server](https://deno.com/manual@v1.32.1/examples/http_server)。大概的意思就是，每一个 http 链接都从一个异步迭代器中产生，我们可以从一个 HTTP 链接中拿到请求的具体信息和处理返回的函数。为了便于测试接口，我们对于非 POST 请求直接返回，对于 POST 请求获取到它的 body，然后发送到飞书。
 
