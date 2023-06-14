@@ -16,6 +16,14 @@ function constructNotificationText(content: Notification) {
 }
 
 async function requestOpenAI(prompt: string) {
+  const kv = await Deno.openKv();
+  const history = await kv.get<string[]>(["history"]);
+  if (!history.value) {
+    await kv.set(["history"], [prompt]);
+  } else {
+    await kv.set(["history"], [...history.value.slice(-9), prompt]);
+  }
+
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     headers: {
       "Content-Type": "application/json",
@@ -129,7 +137,6 @@ async function serveHttp(conn: Deno.Conn) {
       );
     } else {
       const body = await request.json();
-      console.log(body);
       const webhook = body;
       const message = await requestOpenAI(JSON.stringify(webhook));
       await sendToFeishu(message);
